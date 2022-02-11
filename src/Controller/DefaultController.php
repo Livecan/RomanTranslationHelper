@@ -3,6 +3,7 @@
 namespace Drupal\roman_translation_helper\Controller;
 
 use Drupal\Core\Controller\ControllerBase;
+use Symfony\Component\HttpFoundation\JsonResponse;
 
 /**
  * Translation Helper default Controller.
@@ -18,5 +19,9 @@ class DefaultController extends ControllerBase {
         ],
       ],
     ];
+  }
+
+  public function downloadLanguageFiles($moduleName) {
+    return (new JsonResponse([file_get_contents("http://ftp.drupal.org/files/translations/all/$moduleName/")]));
   }
 }

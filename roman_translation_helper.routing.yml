@@ -5,3 +5,11 @@ roman_translation_helper.app_root:
     _controller: 'Drupal\roman_translation_helper\Controller\DefaultController::getApp'
   requirements:
     _access: 'TRUE'
+
+roman_translation_helper.downloader:
+  path: '/roman-translation-helper/download/{moduleName}'
+  defaults:
+    _controller: 'Drupal\roman_translation_helper\Controller\DefaultController::downloadLanguageFiles'
+  requirements:
+    _access: 'TRUE'
+    _format: json
