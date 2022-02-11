@@ -1,4 +1,5 @@
 import React from "react";
 import ReactDOM from "react-dom";
+import App from "./App";
 
-ReactDOM.render(<div>Hi there!</div>, document.getElementById("roman-translation-helper-react-app"));
+ReactDOM.render(<App />, document.getElementById("roman-translation-helper-react-app"));
