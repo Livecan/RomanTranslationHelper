@@ -1,0 +1,4 @@
+name: 'Roman Translation Helper'
+description: 'App for importing manually filtered translation strings in WF installation.'
+core_version_requirement: ^9
+type: module

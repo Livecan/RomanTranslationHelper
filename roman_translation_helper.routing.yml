@@ -1,0 +1,7 @@
+roman_translation_helper.app_root:
+  path: '/roman-translation-helper'
+  defaults:
+    _title: Roman's translation helper
+    _controller: 'Drupal\roman_translation_helper\Controller\DefaultController::getApp'
+  requirements:
+    _access: 'TRUE'
