@@ -2,6 +2,9 @@
 
 namespace Drupal\roman_translation_helper\Controller;
 
+use Drupal\Component\Gettext\PoItem;
+use Drupal\Component\Gettext\PoStreamReader;
+use Drupal\Component\Gettext\PoStreamWriter;
 use Drupal\Core\Controller\ControllerBase;
 use Symfony\Component\HttpFoundation\JsonResponse;
 
@@ -41,24 +44,26 @@ class DefaultController extends ControllerBase {
     $moduleLocalizationHubHtml = file_get_contents("http://ftp.drupal.org/files/translations/all/$moduleName/");
 
     $output = [];
-
     $languages = ['ar', 'es', 'fil', 'fr', 'hi', 'id', 'ru'];
 
     foreach ($languages as $language) {
-      preg_match_all('/href="([^"]*\.' . $language . '\.po)"/', $moduleLocalizationHubHtml, $matches);
+      if (preg_match_all('/href="([^"]*\.' . $language . '\.po)"/', $moduleLocalizationHubHtml, $matches)) {
+        $filename = $matches[1][count($matches[1]) - 1];
 
-      $filename = $matches[1][count($matches[1]) - 1];
+        $psr = new PoStreamReader();
+        $psr->setURI("http://ftp.drupal.org/files/translations/all/$moduleName/$filename");
+        $psr->open();
 
-      $poFileStream = fopen("http://ftp.drupal.org/files/translations/all/$moduleName/$filename", "r");
-      $msgId = NULL;
-      while ($line = fgets($poFileStream)) {
-        if (preg_match('/msgid "([^"]*)"/', $line, $matches)) {
-          $msgId = $matches[1];
+        /** @var \Drupal\Component\Gettext\PoItem $item */
+        while ($item = $psr->readItem()) {
+          $output[$language][$item->getSource()] = $item->getTranslation();
         }
-        elseif ($msgId && preg_match('/msgstr "([^"]*)"/', $line, $matches)) {
-          $msgStr = $matches[1];
-          $output[$language][$msgId] = $msgStr;
-        }
+      }
+    }
+
+    return (new JsonResponse($output));
+
+  }
       }
 
     }
