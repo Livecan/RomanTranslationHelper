@@ -10,6 +10,16 @@ roman_translation_helper.downloader:
   path: '/roman-translation-helper/download/{moduleName}'
   defaults:
     _controller: 'Drupal\roman_translation_helper\Controller\DefaultController::downloadLanguageFiles'
+  methods: [GET]
+  requirements:
+    _access: 'TRUE'
+    _format: json
+
+roman_translation_helper.insert_translations:
+  path: '/roman-translation-helper/insert-translations/{moduleName}'
+  defaults:
+    _controller: 'Drupal\roman_translation_helper\Controller\DefaultController::insertTranslations'
+  methods: [POST]
   requirements:
     _access: 'TRUE'
     _format: json

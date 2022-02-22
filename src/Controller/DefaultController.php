@@ -62,13 +62,70 @@ class DefaultController extends ControllerBase {
     }
 
     return (new JsonResponse($output));
-
   }
+
+  /**
+   * Insert translations into wildfire_language po files.
+   *
+   * Loads data from request body. The data is array indexed by language code
+   * and the content is array indexed by phrase with translation as value.
+   *
+   * Example data:
+   * @code
+   * [
+   *   'ar' => [
+   *     'Operations' => 'عمليا',
+   *     'Disabled' => 'معطل',
+   *   ],
+   *   'es' => [
+   *     'Operations' => 'Operaciones',
+   *   ],
+   * ]
+   *
+   * @param string $moduleName
+   *   Module name.
+   *
+   * @return Symfony\Component\HttpFoundation\JsonResponse
+   *   Empyt Json response.
+   */
+  public function insertTranslations($moduleName) {
+    $translations = json_decode(\Drupal::request()->getContent(), TRUE);
+
+    $cwd = getcwd();
+    $poWriter = new PoStreamWriter();
+
+    foreach ($translations as $language => $languageTranslations) {
+      $poReader = new PoStreamReader();
+      $existingPoItems = [];
+      $translatedPhrases = [];
+      $poReader->setURI("$cwd/modules/custom/wildfire_languages/translations/$language.po");
+      $poReader->open();
+
+      while ($item = $poReader->readItem()) {
+        $existingPoItems[] = $item;
+        $translatedPhrases[] = $item->getSource();
+      }
+      $poReader->close();
+
+      $poWriter->setURI("$cwd/modules/custom/wildfire_languages/translations/$language.po");
+      $poWriter->open();
+      foreach ($existingPoItems as $item) {
+        $poWriter->writeItem($item);
       }
 
+      foreach ($languageTranslations as $phrase => $translation) {
+        if (!in_array($phrase, $translatedPhrases)) {
+          $poItem = new PoItem();
+          $poItem->setSource($phrase);
+          $poItem->setTranslation($translation);
+          $poWriter->writeItem($poItem);
+        }
+      }
+
+      $poWriter->close();
     }
 
-    return (new JsonResponse($output));
+    return new JsonResponse();
   }
 
 }
